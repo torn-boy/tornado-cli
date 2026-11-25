@@ -534,6 +534,10 @@ async function generateProof({ deposit, currency, amount, recipient, relayerAddr
  */
 async function withdraw({ deposit, currency, amount, recipient, relayerURL, refund, privateKey }) {
   const { web3Instance, signerAddress, tornadoProxyAddress, requestOptions, feeOracle, tornadoInstanceAddress, tornadoProxyContract, netSymbol, netId, shouldPromptConfirmation } = globals;
+  const usePrivateKey = global.chainId !== 1 && (privateKey || globals.privateKey);
+  if (!usePrivateKey && [1, 56].includes(Number(netId))) {
+    feeOracle.oracle.eip1559.configuration.minPriority = 0.3; // gwei
+  }
   if (currency === netSymbol.toLowerCase() && refund && refund !== '0') {
     throw new Error('The ETH purchase is supposed to be 0 for ETH withdrawals');
   }
@@ -562,7 +566,7 @@ async function withdraw({ deposit, currency, amount, recipient, relayerURL, refu
     process.exit(1);
   }
 
-  if (global.chainId !== 1 && (privateKey || globals.privateKey)) {
+  if (usePrivateKey) {
     // using private key
 
     // check if the address of recepient matches with the account of provided private key from environment to prevent accidental use of deposit address for withdrawal transaction.

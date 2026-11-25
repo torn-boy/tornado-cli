@@ -1,20 +1,12 @@
-# FROM node 14.21.3-bullseye-slim
-FROM node@sha256:0f5b374fae506741ff14db84daff2937ae788e88fb48a6c66d15de5ee808ccd3
-
-RUN apt update && apt install --yes --no-install-recommends wget git apt-transport-https ca-certificates && rm -rf /var/lib/apt/lists/*
+# Node 14.21.3 on amd64 keeps the packaged Windows target and build inputs consistent.
+FROM --platform=linux/amd64 node@sha256:c0bff0d29a742f40650d5f0305dd581351c10954e6cb6676fc96f47590b9666e
 
 WORKDIR /home/root/tornado-cli
-
-ENV GIT_REPOSITORY=https://git.tornado.ws/tornadocash/tornado-cli
-ENV GIT_COMMIT_HASH=b5bfd6711ccb8139f015e3f4190585162ed69bac
-
-RUN git init && \
-  git remote add origin $GIT_REPOSITORY && \
-  git fetch --depth 1 origin $GIT_COMMIT_HASH && \
-  git checkout $GIT_COMMIT_HASH
-
+COPY .npmrc package.json package-lock.json ./
 RUN npm ci
 
-RUN npm install -g pkg@5.8.1
-
+COPY scripts/createDeterministicExecutable.js scripts/
+COPY cli.js config.js ./
+COPY abis/ abis/
+COPY circuits/tornado.json circuits/tornado.json
 RUN node scripts/createDeterministicExecutable.js

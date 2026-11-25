@@ -6,9 +6,11 @@ Command line tool to interact with [Tornado Cash protocol](https://docs.tornadoc
 
 ##### Simple installation for Windows users:
 
-Download archive file from this git: https://github.com/tornado-dao/tornado-cli/archive/refs/heads/master.zip
+Download archive file from this git: https://github.com/torn-boy/tornado-cli/archive/refs/heads/master.zip
 
-Extract it and you can run CLI executable file (but don't move it from this directory): `tornado-cli.exe -h`
+Extract the archive, open PowerShell in the extracted folder and run `.\tornado-cli.exe -h`. Keep the `circuits` and `cache` folders alongside the executable.
+
+Windows x64 executable SHA-256: `52ca6aa1284936a3eed5d3ffa7610712d4689374d32e875c6813d25d3721e2a1`.
 
 ##### Advanced installation (for professional users, any platform):
 
@@ -25,10 +27,10 @@ You also need to install C++ build tools in order to do 'npm install', for more 
 If you have git installed on your system, clone the master branch.
 
 ```bash
-$ git clone https://github.com/tornado-dao/tornado-cli.git
+$ git clone https://github.com/torn-boy/tornado-cli.git
 ```
 
-Or, download the archive file from git: https://github.com/tornado-dao/tornado-cli/archive/refs/heads/master.zip
+Or, download the archive file from git: https://github.com/torn-boy/tornado-cli/archive/refs/heads/master.zip
 
 After downloading or cloning the repository, you must install necessary libraries using the following command.
 
@@ -53,12 +55,16 @@ Also, you can use VPN for CLI without Tor or even combine it.
 
 All code logic located in `cli.js`, other files is just testing scripts or static files. You can check or change any part of the code and at next `node cli.js` run changes will apply.
 
-Any user can check that the precompiled `tornado-cli.exe` matches the source code. To verify **tornado-cli.exe**:
+To verify the Windows x64 executable, build it from the same checkout using Docker. On an Apple silicon Mac, Docker needs Linux amd64 emulation enabled.
 
-1. Build docker image from latest commit: `docker build -t tornado-cli .`
-2. Create container`docker create --name tornado-cli tornado-cli:latest`
-3. Copy executable from container `docker cp tornado-cli:/home/root/tornado-cli/tornado-cli.exe tornado-cli-verify.exe`
-4. Compare hashes of original tornado-cli.exe and freshly generated executable with two commands: on Windows use `CertUtil -hashfile tornado-cli.exe SHA256` and `CertUtil -hashfile tornado-cli-verify.exe SHA256`, on Linux - `sha256sum tornado-cli.exe` and `sha256sum tornado-cli-verify.exe`. Hashes should be identical.
+```sh
+docker build --platform linux/amd64 -t tornado-cli .
+docker create --name tornado-cli-verify tornado-cli
+docker cp tornado-cli-verify:/home/root/tornado-cli/tornado-cli.exe tornado-cli-verify.exe
+docker rm tornado-cli-verify
+```
+
+Compare the two files with `shasum -a 256 tornado-cli.exe tornado-cli-verify.exe` on macOS, `sha256sum tornado-cli.exe tornado-cli-verify.exe` on Linux, or `Get-FileHash tornado-cli.exe,tornado-cli-verify.exe` in PowerShell. The SHA-256 values should match.
 
 ### Commands and usage
 
